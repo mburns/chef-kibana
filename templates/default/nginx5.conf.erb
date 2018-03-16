@@ -1,9 +1,3 @@
-upstream elasticsearch {
-  <% node['kibana']['elasticsearch']['hosts'].each do |ip| %>
-  server <%= ip %>:<%= @elasticserach_port %> fail_timeout=0;
-  <% end %>
-}
-
 <% if @ssl %>
 server {
   listen      <%= @listen_http %>;
@@ -32,9 +26,11 @@ server {
   access_log  <%= @log_dir %>/<%= @server_name %>.log;
 
 
-  location / {
-    root <%= @root %>;
-    index index.html index.htm;
+  location ~ (/|/app/kibana|/bundles/|/kibana4|/status|/plugins) {
+    proxy_set_header        Host $host;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
     <% if @auth %>
     auth_basic "Kibana Auth";
     auth_basic_user_file <%= @auth_file %>;
@@ -42,37 +38,7 @@ server {
     <% if @kibana_service %>
     proxy_pass <%= @kibana_service %>;
     <% end %>
+    proxy_read_timeout  90;
+    rewrite /kibana4/(.*)$ /$1 break;
   }
-
-  <% if @proxy %>
-  location ~ ^/_aliases$ {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-  location ~ ^/.*/_aliases$ {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-  location ~ ^/_nodes$ {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-  location ~ ^/.*/_search$ {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-  location ~ ^/.*/_mapping {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-
-  location ~ ^/<%= @index %>/dashboard/.*$ {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-  location ~ ^/<%= @index %>/temp.*$ {
-    proxy_pass http://elasticsearch;
-    proxy_read_timeout 90;
-  }
-  <% end %>
 }

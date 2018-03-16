@@ -9,8 +9,11 @@ AllCops:
 
 BlockComments:
   Enabled: false
-BlockLength:
-  Enabled: false
+
+Style/RescueModifier:
+  Exclude:
+    - 'Rakefile'
+    - 'libraries/helpers.rb'
 
 LeadingCommentSpace:
   Enabled: false
@@ -18,8 +21,23 @@ LeadingCommentSpace:
 LineLength:
   Enabled: false
 
-Style/FileName:
-  Exclude:
-    - 'Berksfile'
-    - 'Gemfile'
-    - 'Vagrantfile'
+# Longer classes are okay.
+Metrics/MethodLength:
+  Max: 30
+Metrics/ModuleLength:
+  Max: 150
+
+# We're not against complexity.
+Metrics/AbcSize:
+  Max: 55
+Metrics/CyclomaticComplexity:
+  Max: 20
+Metrics/PerceivedComplexity:
+  Max: 20
+
+# Mixlib::ShellOut is nice to have as an older hash syntax
+Style/HashSyntax:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
