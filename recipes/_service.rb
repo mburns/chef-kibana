@@ -18,3 +18,10 @@ service 'kibana' do
   supports start: true, restart: true, stop: true, status: true
   action %i[enable start]
 end
+
+poise_service 'kibana' do
+  command "#{node['kibana']['service']['bin_path']}/current/bin/kibana #{node['kibana']['service']['options']}"
+  uid node['kibana']['user']
+  gid node['kibana']['user']
+  options status_port: 8000
+end
