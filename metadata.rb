@@ -19,6 +19,7 @@ supports 'centos'
 depends 'build-essential'
 depends 'ark'
 depends 'apt'
+depends 'poise-service'
 
 # Suggests is not officially valid, that is why these are commented out
 # suggests 'apache2', '>= 2.0'
